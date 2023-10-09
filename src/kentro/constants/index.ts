@@ -1,0 +1,1 @@
+export const KENTRO_SERVICE = 'KENTRO_SERVICE';
