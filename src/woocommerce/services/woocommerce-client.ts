@@ -9,6 +9,8 @@ import type { RequestOptions } from 'oauth-1.0a';
 import OAuth from 'oauth-1.0a';
 import { firstValueFrom } from 'rxjs';
 
+import { genericRetryHandler } from '@/common/utils';
+
 import type {
   IGetAllProductsResponse,
   IProduct,
@@ -105,9 +107,16 @@ export class WooCommerceClient implements IWooCommerceClient {
       const authHeader = this.getAuthHeaderForRequest(request);
 
       const response = await firstValueFrom(
-        this.httpService.get<IProduct>(request.url, {
-          headers: { ...authHeader },
-        }),
+        this.httpService
+          .get<IProduct>(request.url, {
+            headers: { ...authHeader },
+          })
+          .pipe(
+            genericRetryHandler({
+              maxRetryAttempts: 3,
+              includedStatusCodes: [429],
+            }),
+          ),
       );
 
       return response.data;

@@ -3,6 +3,8 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { HttpStatusCode } from 'axios';
 import { firstValueFrom } from 'rxjs';
 
+import { genericRetryHandler } from '@/common/utils';
+
 import type {
   IAuthenticateResponse,
   ICreateProduct,
@@ -120,14 +122,21 @@ export class KentroClient implements IKentroClient {
    */
   public async getProducts(channelId: string): Promise<IGetProductsResponse> {
     const response = await firstValueFrom(
-      this.httpService.get<IGetProductsResponse>(
-        `${this.apiConfig.apiUrl}/${this.apiConfig.apiVersion}/channel/product/list?$channel=${channelId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.apiToken}`,
+      this.httpService
+        .get<IGetProductsResponse>(
+          `${this.apiConfig.apiUrl}/${this.apiConfig.apiVersion}/channel/product/list?$channel=${channelId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${this.apiToken}`,
+            },
           },
-        },
-      ),
+        )
+        .pipe(
+          genericRetryHandler({
+            maxRetryAttempts: 3,
+            includedStatusCodes: [429],
+          }),
+        ),
     );
 
     return response.data;
@@ -142,15 +151,22 @@ export class KentroClient implements IKentroClient {
     createProductInput: ICreateProduct[],
   ): Promise<ICreateProductResponse> {
     const response = await firstValueFrom(
-      this.httpService.post<ICreateProductResponse>(
-        `${this.apiConfig.apiUrl}/${this.apiConfig.apiVersion}/channel/product/create`,
-        createProductInput,
-        {
-          headers: {
-            Authorization: `Bearer ${this.apiToken}`,
+      this.httpService
+        .post<ICreateProductResponse>(
+          `${this.apiConfig.apiUrl}/${this.apiConfig.apiVersion}/channel/product/create`,
+          createProductInput,
+          {
+            headers: {
+              Authorization: `Bearer ${this.apiToken}`,
+            },
           },
-        },
-      ),
+        )
+        .pipe(
+          genericRetryHandler({
+            maxRetryAttempts: 3,
+            includedStatusCodes: [429],
+          }),
+        ),
     );
 
     return response.data;
