@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/filename-case */
-import Box from 'cli-box';
+import * as Box from 'cli-box';
 
 import type { RootConfig } from '@/config';
 

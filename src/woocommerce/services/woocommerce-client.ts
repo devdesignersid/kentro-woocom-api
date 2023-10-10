@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { HttpStatusCode } from 'axios';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import type { RequestOptions } from 'oauth-1.0a';
-import OAuth from 'oauth-1.0a';
+import * as OAuth from 'oauth-1.0a';
 import { firstValueFrom } from 'rxjs';
 
 import { genericRetryHandler } from '@/common/utils';
