@@ -47,7 +47,8 @@ export interface IProduct {
   SKU: string;
   barcode: string;
   groupId: string;
-  id: number;
+  globalExternalId: string;
+  id: string;
   _id: string;
 }
 
@@ -87,6 +88,23 @@ export interface ICreateProduct {
   listToChannels: IListToChannel[];
 }
 
+/**
+ * TODO: Add support for other fields
+ */
+export interface IUpdateProduct {
+  productObjectId: string;
+  name?: string;
+  SKU?: string;
+  productType: ProductType;
+  barcode?: string;
+  description?: string;
+  shortDescription?: string;
+  unitCost?: number;
+  isPublished?: boolean;
+  listToAllChannelsAs?: ProductStatus;
+  listToChannels?: IListToChannel[];
+}
+
 export interface IListToChannel {
   isPublished: boolean;
   id: string;
@@ -105,5 +123,10 @@ export enum ProductType {
 
 export interface ICreateProductResponse {
   objectId: string;
-  status: string;
+  status: 'created';
+}
+
+export interface IUpdateProductResponse {
+  objectId: string;
+  status: 'updated';
 }

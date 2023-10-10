@@ -2,6 +2,8 @@ import type {
   ICreateProduct,
   ICreateProductResponse,
   IGetProductsResponse,
+  IProduct,
+  IUpdateProduct,
 } from '../types';
 
 export interface IKentroClient {
@@ -9,4 +11,6 @@ export interface IKentroClient {
   createProduct(
     createProductInput: ICreateProduct[],
   ): Promise<ICreateProductResponse>;
+  getAProductBySKU(sku: string, channelId: string): Promise<IProduct>;
+  updateAProduct(updateProductInput: IUpdateProduct);
 }

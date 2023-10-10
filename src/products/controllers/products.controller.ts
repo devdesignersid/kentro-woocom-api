@@ -1,5 +1,15 @@
-import { Body, Controller, Get, Inject, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Inject,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { IProduct } from '@/woocommerce/types';
 
 import { PRODUCTS_SERVICE } from '../constants';
 import {
@@ -19,7 +29,12 @@ export class ProductsController {
   @Get('/kentro/')
   @ApiOperation({ summary: 'Get products from Kentro' })
   @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
-  @ApiQuery({ name: 'channelId', type: Number, required: true })
+  @ApiQuery({
+    name: 'channelId',
+    type: Number,
+    required: true,
+    description: 'ID of the channel for which to retrieve products',
+  })
   public getProductsFromKentro(
     @Query() getProductsFromKentroDto: GetProductsFromKentroDto,
   ) {
@@ -54,5 +69,16 @@ export class ProductsController {
     );
 
     return { message: 'Product import process started' };
+  }
+
+  @Post('/woocommerce/sync')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Sync a WooCommerce product with Kentro' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product sync completed successfully',
+  })
+  public syncWooCommerceProductWithKentro(@Body() body: IProduct) {
+    return this.productsService.syncWooCommerceProductWithKentro(body);
   }
 }

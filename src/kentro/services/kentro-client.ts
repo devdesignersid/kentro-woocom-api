@@ -11,6 +11,9 @@ import type {
   ICreateProductResponse,
   IGetProductsResponse,
   IKentroApiConfig,
+  IProduct,
+  IUpdateProduct,
+  IUpdateProductResponse,
   IValidateCredentialsResponse,
 } from '../types';
 import type { IKentroClient } from './kentro-client.interface';
@@ -155,6 +158,67 @@ export class KentroClient implements IKentroClient {
         .post<ICreateProductResponse>(
           `${this.apiConfig.apiUrl}/${this.apiConfig.apiVersion}/channel/product/create`,
           createProductInput,
+          {
+            headers: {
+              Authorization: `Bearer ${this.apiToken}`,
+            },
+          },
+        )
+        .pipe(
+          genericRetryHandler({
+            maxRetryAttempts: 3,
+            includedStatusCodes: [429],
+          }),
+        ),
+    );
+
+    return response.data;
+  }
+
+  /**
+   * Retrieves a product from Kentro by SKU.
+   * @param {string} SKU- The SKU of the product.
+   * @param {string} channelId - The ID of the channel.
+   * @returns {Promise<IProduct>} A Promise resolving to the product.
+   */
+  public async getAProductBySKU(
+    sku: string,
+    channelId: string,
+  ): Promise<IProduct> {
+    const response = await firstValueFrom(
+      this.httpService
+        .get<IProduct>(
+          `${this.apiConfig.apiUrl}/${this.apiConfig.apiVersion}/channel/product/details/${sku}?$channel=${channelId}&$idType=SKU`,
+          {
+            headers: {
+              Authorization: `Bearer ${this.apiToken}`,
+            },
+          },
+        )
+        .pipe(
+          genericRetryHandler({
+            maxRetryAttempts: 3,
+            includedStatusCodes: [429],
+          }),
+        ),
+    );
+
+    return response.data;
+  }
+
+  /**
+   * Updates a product in Kentro.
+   * @param {IUpdateProduct} updateProductInput - The product data to update.
+   * @returns {Promise<IUpdateProductResponse>} A Promise resolving to the response containing the updated product id.
+   */
+  public async updateAProduct(
+    updateProductInput: IUpdateProduct,
+  ): Promise<IUpdateProductResponse> {
+    const response = await firstValueFrom(
+      this.httpService
+        .post<ICreateProductResponse>(
+          `${this.apiConfig.apiUrl}/${this.apiConfig.apiVersion}/channel/product/update`,
+          [updateProductInput],
           {
             headers: {
               Authorization: `Bearer ${this.apiToken}`,
